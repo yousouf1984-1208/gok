@@ -181,17 +181,29 @@ function deleteAllTable() {
   }
 
   // Add new row
-  function addRow(){
-    const name = document.getElementById("newName").value.trim();
-    const status = document.getElementById("newStatus").value.trim();
-    if(!name || !status){ alert("Fill both fields"); return; }
-    firebase.database().ref('tableData').once('value').then(snapshot=>{
-      const data = snapshot.val() || [];
-      data.push([name,status]);
-      firebase.database().ref('tableData').set(data).then(()=>{ loadTable(); });
-      document.getElementById("newName").value = "";
-      document.getElementById("newStatus").value = "";
+function addRow() {
+  const name = document.getElementById("newName").value.trim();
+  const status = document.getElementById("newStatus").value.trim();
+  if(!name || !status){ 
+    alert("Please fill both Name and Status fields"); 
+    return; 
+  }
+
+  // Read existing table data from Firebase
+  firebase.database().ref('tableData').once('value').then(snapshot=>{
+    const data = snapshot.val() || [];
+    data.push([name, status]); // Add the new row at the end
+    // Save back to Firebase
+    firebase.database().ref('tableData').set(data).then(()=>{
+      loadTable(); // Reload the table correctly
     });
+
+    // Clear input fields
+    document.getElementById("newName").value = "";
+    document.getElementById("newStatus").value = "";
+  });
+}
+
   }
 
   // Delete row
