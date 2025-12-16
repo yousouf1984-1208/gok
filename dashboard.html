@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Information Dashboard</title>
+<style>
+  body { font-family: Arial; margin: 0; background: #f4f6f8; }
+  header { background: #2c3e50; color: white; padding: 20px 40px; text-align: center; }
+  nav { background: #34495e; display: flex; justify-content: space-around; padding: 10px 0; }
+  nav a { color: white; text-decoration: none; font-weight: bold; padding: 8px 15px; }
+  nav a:hover { background: #1abc9c; border-radius: 5px; }
+  main { padding: 20px 40px; }
+  section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  th { background: #2c3e50; color: white; }
+  input, button { padding: 8px; margin: 5px; }
+  iframe { width: 100%; height: 300px; border: none; margin-top: 10px; }
+  footer { text-align: center; padding: 20px; background: #2c3e50; color: white; }
+  td.editable { background-color: #fcfcfc; cursor: pointer; }
+  td.editable:hover { background-color: #eef; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Information Dashboard</h1>
+  <p>Welcome! Only authorized users can access this page.</p>
+</header>
+
+<nav>
+  <a href="#news">News</a>
+  <a href="#map">Map</a>
+  <a href="#table">Data Table</a>
+  <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<main>
+  <!-- News Section -->
+  <section id="news">
+    <h2>Latest News</h2>
+    <ul id="newsList"></ul>
+    <h4>Add News</h4>
+    <input type="text" id="newsInput" placeholder="Enter news item">
+    <button onclick="addNews()">Add News</button>
+  </section>
+
+  <!-- Map Section -->
+  <section id="map">
+    <h2>Location Map</h2>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126743.91915273646!2d57.495!3d-20.25!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x217b04f1e5ef2e4b%3A0x1234567890abcdef!2sMauritius!5e0!3m2!1sen!2sus!4v1234567890123" allowfullscreen="" loading="lazy"></iframe>
+  </section>
+
+  <!-- Data Table Section -->
+  <section id="table">
+    <h2>Upload Data Table</h2>
+    <input type="file" id="csvFile" accept=".csv">
+    <button onclick="uploadTable()">Upload Table</button>
+
+    <h2>Table</h2>
+    <table id="dataTable">
+      <tr><th>ID</th><th>Name</th><th>Status</th><th>Actions</th></tr>
+    </table>
+
+    <h4>Add Row</h4>
+    <input type="text" id="newName" placeholder="Name">
+    <input type="text" id="newStatus" placeholder="Status">
+    <button onclick="addRow()">Add Row</button>
+  </section>
+</main>
+
+<footer>
+  &copy; 2025 Your Organization
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyDPJ7bZq3KNLoYMe4_6hR4k8i9xfMhYfAk",
+    authDomain: "website-d9c1a.firebaseapp.com",
+    databaseURL: "https://website-d9c1a-default-rtdb.firebaseio.com/"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  // Auth check
+  firebase.auth().onAuthStateChanged(user => {
+    if(!user) window.location.href = "index.html";
+    else { loadTable(); loadNews(); }
+  });
+
+  function logout() { firebase.auth().signOut().then(()=>window.location.href="index.html"); }
+
+  // Upload CSV
+  function uploadTable() {
+    const file = document.getElementById("csvFile").files[0];
+    if(!file){ alert("Select a CSV file"); return; }
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const rows = e.target.result.split("\n").filter(r=>r.trim()!=="").map(r=>r.split(","));
+      firebase.database().ref('tableData').set(rows, error=>{
+        if(error) alert("Error saving table: "+error);
+        else loadTable();
+      });
+    };
+    reader.readAsText(file);
+  }
+
+  // Load table
+  function loadTable(){
+    firebase.database().ref('tableData').once('value').then(snapshot=>{
+      const tableData = snapshot.val();
+      const table = document.getElementById("dataTable");
+      table.innerHTML = "<tr><th>ID</th><th>Name</th><th>Status</th><th>Actions</th></tr>";
+      if(tableData){
+        tableData.forEach((row, index)=>{
+          const tr = table.insertRow();
+          tr.insertCell(0).innerText = index+1; // auto ID
+          tr.insertCell(1).innerText = row[0];
+          tr.insertCell(1).className = "editable";
+          tr.insertCell(2).innerText = row[1];
+          tr.insertCell(2).className = "editable";
+          const actionCell = tr.insertCell(3);
+          const delBtn = document.createElement("button");
+          delBtn.innerText="Delete";
+          delBtn.onclick = ()=>deleteRow(index);
+          actionCell.appendChild(delBtn);
+        });
+      }
+      makeEditable();
+    });
+  }
+
+  // Make table editable
+  function makeEditable(){
+    const editableCells = document.querySelectorAll("td.editable");
+    editableCells.forEach(cell=>{
+      cell.onclick = function(){
+        const oldVal = this.innerText;
+        const input = document.createElement("input");
+        input.value = oldVal;
+        input.onblur = ()=>{
+          this.innerText = input.value;
+          saveTable();
+        };
+        this.innerText = "";
+        this.appendChild(input);
+        input.focus();
+      };
+    });
+  }
+
+  // Save table to Firebase
+  function saveTable(){
+    const table = document.getElementById("dataTable");
+    const data = [];
+    for(let i=1; i<table.rows.length;i++){
+      const row = table.rows[i];
+      data.push([row.cells[1].innerText,row.cells[2].innerText]);
+    }
+    firebase.database().ref('tableData').set(data);
+  }
+
+  // Add new row
+  function addRow(){
+    const name = document.getElementById("newName").value.trim();
+    const status = document.getElementById("newStatus").value.trim();
+    if(!name || !status){ alert("Fill both fields"); return; }
+    firebase.database().ref('tableData').once('value').then(snapshot=>{
+      const data = snapshot.val() || [];
+      data.push([name,status]);
+      firebase.database().ref('tableData').set(data).then(()=>{ loadTable(); });
+      document.getElementById("newName").value = "";
+      document.getElementById("newStatus").value = "";
+    });
+  }
+
+  // Delete row
+  function deleteRow(index){
+    firebase.database().ref('tableData').once('value').then(snapshot=>{
+      const data = snapshot.val();
+      data.splice(index,1);
+      firebase.database().ref('tableData').set(data).then(()=>{ loadTable(); });
+    });
+  }
+
+  // News
+  function addNews(){
+    const newsItem = document.getElementById("newsInput").value;
+    if(newsItem.trim()===""){ alert("Enter news item"); return; }
+    firebase.database().ref('news').push(newsItem, err=>{
+      if(err) alert(err);
+      else document.getElementById("newsInput").value="";
+    });
+  }
+
+  function loadNews(){
+    const newsList = document.getElementById("newsList");
+    newsList.innerHTML = "";
+    firebase.database().ref('news').on('value', snapshot=>{
+      newsList.innerHTML = "";
+      snapshot.forEach(item=>{
+        const li = document.createElement("li");
+        li.innerText = item.val();
+        // add delete button
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "Delete";
+        delBtn.style.marginLeft="10px";
+        delBtn.onclick = ()=>{ firebase.database().ref('news/'+item.key).remove(); };
+        li.appendChild(delBtn);
+        newsList.appendChild(li);
+      });
+    });
+  }
+
+</script>
+
+</body>
+</html>
