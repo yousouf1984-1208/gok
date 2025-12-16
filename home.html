@@ -1,24 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Home</title>
+  <title>Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 40px; background-color: #f4f4f4; }
+    h1 { color: #333; }
+    table { border-collapse: collapse; width: 80%; margin-top: 20px; }
+    th, td { border: 1px solid #999; padding: 8px; text-align: center; }
+    th { background-color: #555; color: white; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    iframe { margin-top: 20px; border: 2px solid #333; }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  </style>
 </head>
-<body style="font-family: Arial; padding:40px;">
+<body>
 
-<h1>Dashboard 🔐</h1>
-<p>You are logged in successfully.</p>
+<h1>Welcome to Your Dashboard 🔐</h1>
+<p>You are successfully logged in.</p>
+
+<h2>Quick Links</h2>
+<ul>
+  <li><a href="#">Profile</a></li>
+  <li><a href="#">Reports</a></li>
+  <li><a href="#">Settings</a></li>
+</ul>
+
+<h2>Sample Map</h2>
+<iframe
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126743.91915273646!2d57.495!3d-20.25!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x217b04f1e5ef2e4b%3A0x1234567890abcdef!2sMauritius!5e0!3m2!1sen!2sus!4v1234567890123"
+  width="600" height="400" allowfullscreen="" loading="lazy"></iframe>
+
+<h2>Sample Data Table</h2>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Status</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>John Doe</td>
+    <td>Active</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Jane Smith</td>
+    <td>Inactive</td>
+  </tr>
+</table>
 
 <button onclick="logout()">Logout</button>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-
 <script>
+  // Firebase config
   firebase.initializeApp({
     apiKey: "AIzaSyDPJ7bZq3KNLoYMe4_6hR4k8i9xfMhYfAk",
     authDomain: "website-d9c1a.firebaseapp.com"
   });
 
+  // Check if user is logged in
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      // Not logged in, redirect to login page
+      window.location.href = "index.html";
+    }
+  });
+
+  // Logout function
   function logout() {
     firebase.auth().signOut().then(function() {
       window.location.href = "index.html";
