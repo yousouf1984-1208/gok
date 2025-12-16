@@ -4,32 +4,39 @@
   <title>Login</title>
 </head>
 <body>
-  <h2>Login</h2>
 
-  <input type="email" id="email" placeholder="Email"><br><br>
-  <input type="password" id="password" placeholder="Password"><br><br>
+<h2>Login</h2>
 
-  <button onclick="login()">Login</button>
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<button onclick="login()">Login</button>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-    };
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyDPJ7bZq3KNLoYMe4_6hR4k8i9xfMhYfAk",
+    authDomain: "website-d9c1a.firebaseapp.com"
+  };
 
-    function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  firebase.initializeApp(firebaseConfig);
 
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => window.location.href = "home.html")
-        .catch(err => alert(err.message));
-    }
-  </script>
+  function login() {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(function() {
+        window.location.href = "home.html";
+      })
+      .catch(function(error) {
+        alert(error.message);
+      });
+  }
+</script>
+
 </body>
 </html>
