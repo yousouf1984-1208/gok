@@ -56,6 +56,8 @@
     <h2>Upload Data Table</h2>
     <input type="file" id="csvFile" accept=".csv">
     <button onclick="uploadTable()">Upload Table</button>
+    <button onclick="deleteAllTable()">Delete Entire Table</button>
+
 
     <h2>Table</h2>
     <table id="dataTable">
@@ -68,6 +70,21 @@
     <button onclick="addRow()">Add Row</button>
   </section>
 </main>
+function deleteAllTable() {
+  if(confirm("Are you sure you want to delete the entire table? This cannot be undone.")) {
+    // Remove table data from Firebase
+    firebase.database().ref('tableData').remove()
+      .then(() => {
+        // Clear the table on the page
+        const table = document.getElementById("dataTable");
+        table.innerHTML = "<tr><th>ID</th><th>Name</th><th>Status</th><th>Actions</th></tr>";
+        alert("Table deleted successfully.");
+      })
+      .catch(error => {
+        alert("Error deleting table: " + error.message);
+      });
+  }
+}
 
 <footer>
   &copy; 2025 Your Organization
