@@ -3,8 +3,28 @@
 <head>
   <title>Home</title>
 </head>
-<body>
-  <h1>Welcome! 🔐</h1>
-  <p>This page is protected.</p>
+<body style="font-family: Arial; padding:40px;">
+
+<h1>Dashboard 🔐</h1>
+<p>You are logged in successfully.</p>
+
+<button onclick="logout()">Logout</button>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+<script>
+  firebase.initializeApp({
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com"
+  });
+
+  function logout() {
+    firebase.auth().signOut().then(function() {
+      window.location.href = "index.html";
+    });
+  }
+</script>
+
 </body>
 </html>
