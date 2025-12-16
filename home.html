@@ -1,30 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Home</title>
-</head>
-<body style="font-family: Arial; padding:40px;">
+import React from 'react';
 
-<h1>Dashboard 🔐</h1>
-<p>You are logged in successfully.</p>
+function Welcome() {
+  return (
+    <div style={{ display: 'flex', height: '100vh', fontFamily: 'Arial, sans-serif' }}>
+      
+      {/* Sidebar */}
+      <aside style={{ width: '200px', background: '#2c3e50', color: '#ecf0f1', padding: '20px' }}>
+        <h2>My Dashboard</h2>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          <li style={{ margin: '15px 0' }}><a href="#" style={{ color: '#ecf0f1', textDecoration: 'none' }}>Home</a></li>
+          <li style={{ margin: '15px 0' }}><a href="#" style={{ color: '#ecf0f1', textDecoration: 'none' }}>Map</a></li>
+          <li style={{ margin: '15px 0' }}><a href="#" style={{ color: '#ecf0f1', textDecoration: 'none' }}>Reports</a></li>
+          <li style={{ margin: '15px 0' }}><a href="#" style={{ color: '#ecf0f1', textDecoration: 'none' }}>Settings</a></li>
+        </ul>
+      </aside>
 
-<button onclick="logout()">Logout</button>
+      {/* Main Content */}
+      <main style={{ flexGrow: 1, padding: '20px', background: '#ecf0f1' }}>
+        <header style={{ marginBottom: '20px' }}>
+          <h1>Welcome to Your Dashboard</h1>
+          <p>Here you can manage your site content, view maps, and check reports.</p>
+        </header>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+        {/* Map Placeholder */}
+        <section style={{ marginBottom: '20px' }}>
+          <h2>Map</h2>
+          <div style={{ width: '100%', height: '300px', background: '#bdc3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2c3e50' }}>
+            Map will appear here
+          </div>
+        </section>
 
-<script>
-  firebase.initializeApp({
-    apiKey: "AIzaSyDPJ7bZq3KNLoYMe4_6hR4k8i9xfMhYfAk",
-    authDomain: "website-d9c1a.firebaseapp.com"
-  });
+        {/* Info Sections */}
+        <section style={{ display: 'flex', gap: '20px' }}>
+          <div style={{ flex: 1, background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+            <h3>Section 1</h3>
+            <p>Details or stats about your website.</p>
+          </div>
+          <div style={{ flex: 1, background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+            <h3>Section 2</h3>
+            <p>Additional information or charts.</p>
+          </div>
+        </section>
 
-  function logout() {
-    firebase.auth().signOut().then(function() {
-      window.location.href = "index.html";
-    });
-  }
-</script>
+        {/* Footer */}
+        <footer style={{ marginTop: '40px', textAlign: 'center', color: '#7f8c8d' }}>
+          &copy; 2025 My Dashboard
+        </footer>
+      </main>
+    </div>
+  );
+}
 
-</body>
-</html>
+export default Welcome;
